@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apresentação: Análise de Função</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            overflow: hidden;
+        }
+        
+        .slideshow-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+        
+        .slide {
+            display: none;
+            padding: 40px;
+            height: 100vh;
+            background: white;
+            position: relative;
+            animation: slideIn 0.5s ease-in-out;
+        }
+        
+        .slide.active {
+            display: block;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        .slide h1 {
+            color: #2d3748;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .slide h2 {
+            color: #3182ce;
+            margin-bottom: 20px;
+            font-size: 2em;
+            border-left: 5px solid #3182ce;
+            padding-left: 15px;
+        }
+        
+        .navigation {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+        }
+        
+        .nav-btn {
+            background: #3182ce;
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            margin: 0 10px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(49, 130, 206, 0.4);
+        }
+        
+        .nav-btn:hover {
+            background: #2c5282;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(49, 130, 206, 0.6);
+        }
+        
+        .nav-btn:disabled {
+            background: #a0aec0;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .slide-counter {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(49, 130, 206, 0.9);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            z-index: 1000;
+        }
+        
+        .data-table {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto 30px;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        
+        .data-table th, .data-table td {
+            padding: 15px;
+            text-align: center;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 18px;
+        }
+        
+        .data-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: bold;
+        }
+        
+        .data-table tr:hover {
+            background: #f7fafc;
+            transform: scale(1.02);
+            transition: all 0.3s ease;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 500px;
+            margin: 20px auto;
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+        
+        .formula-box {
+            background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+            color: #e2e8f0;
+            padding: 30px;
+            border-radius: 15px;
+            font-family: 'Courier New', monospace;
+            text-align: center;
+            font-size: 24px;
+            margin: 20px auto;
+            max-width: 600px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+            border: 3px solid #3182ce;
+        }
+        
+        .highlight-box {
+            background: linear-gradient(135deg, #e8f4fd 0%, #bee3f8 100%);
+            padding: 25px;
+            border-radius: 15px;
+            margin: 20px 0;
+            border-left: 6px solid #3182ce;
+            box-shadow: 0 4px 15px rgba(49, 130, 206, 0.2);
+        }
+        
+        .highlight-box h3 {
+            color: #2c5282;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+        }
+        
+        .highlight-box ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .highlight-box li {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(49, 130, 206, 0.2);
+            font-size: 16px;
+        }
+        
+        .highlight-box li:before {
+            content: "✓ ";
+            color: #3182ce;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+        
+        .center-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 80vh;
+        }
+        
+        .conclusion-box {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(72, 187, 120, 0.3);
+        }
+        
+        .conclusion-box h3 {
+            font-size: 1.8em;
+            margin-bottom: 15px;
+        }
+        
+        .conclusion-box p {
+            font-size: 1.2em;
+            line-height: 1.6;
+        }
+        
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            align-items: start;
+        }
+        
+        @media (max-width: 768px) {
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+            .slide {
+                padding: 20px;
+            }
+            .slide h1 {
+                font-size: 2em;
+            }
+            .slide h2 {
+                font-size: 1.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="slideshow-container">
+        <div class="slide-counter">
+            <span id="currentSlide">1</span> / <span id="totalSlides">8</span>
+        </div>
+        
+        <!-- Slide 1: Título -->
+        <div class="slide active">
+            <div class="center-content">
+                <h1>📊 ANÁLISE DE FUNÇÃO</h1>
+                <h2 style="text-align: center; border: none; color: #4a5568;">Relação entre Lucro Total e Preço do Produto</h2>
+                <div style="margin-top: 40px; text-align: center; font-size: 1.2em; color: #4a5568;">
+                    <p>Trabalho de Matemática Aplicada</p>
+                    <p style="margin-top: 20px; font-style: italic;">Modelagem de Funções Quadráticas</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Slide 2: Dados -->
+        <div class="slide">
+            <h1>📋 DADOS DO PROBLEMA</h1>
+            <div class="center-content">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Lucro Total (R$)</th>
+                            <th>Preço do Produto (R$)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>0</td><td>-5</td></tr>
+                        <tr><td>2</td><td>27</td></tr>
+                        <tr><td>4</td><td>43</td></tr>
+                        <tr><td>6</td><td>43</td></tr>
+                        <tr><td>10</td><td>-5</td></tr>
+                    </tbody>
+                </table>
+                <div class="highlight-box">
+                    <h3>Contexto</h3>
+                    <p>Dados representam a relação entre o lucro de uma empresa e o preço estabelecido para seu produto. Objetivo: encontrar a função matemática que modela essa relação.</p>
+                </div>
+            </div>
+        </div>
+        
+       <!-- Slide 3: Gráfico de Pontos -->
+        <div class="slide">
+            <h1>📈 PLOTAGEM DOS PONTOS</h1>
+            <div class="two-column">
+                <div>
+                    <div class="chart-container" style="height: 400px;">
+                        <canvas id="scatterChart"></canvas>
+                    </div>
+                </div>
+                <div>
+                    <div class="highlight-box">
+                        <h3>Observações Iniciais</h3>
+                        <ul>
+                            <li>Os pontos não formam uma linha reta</li>
+                            <li>Formato sugere uma parábola</li>
+                            <li>Existe um ponto máximo aparente</li>
+                            <li>Comportamento típico de função quadrática</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Slide 4: Teste da Função -->
+        <div class="slide">
+            <h1>🧮 TESTE DAS DIFERENÇAS</h1>
+            <div class="two-column">
+                <div>
+                    <h3>Primeira Diferença (Δp)</h3>
+                    <table class="data-table">
+                        <tr><th>L</th><th>p</th><th>Δp</th></tr>
+                        <tr><td>0</td><td>-5</td><td>-</td></tr>
+                        <tr><td>2</td><td>27</td><td>32</td></tr>
+                        <tr><td>4</td><td>43</td><td>16</td></tr>
+                        <tr><td>6</td><td>43</td><td>0</td></tr>
+                        <tr><td>10</td><td>-5</td><td>-48</td></tr>
+                    </table>
+                    
+                    <h3 style="margin-top: 20px;">Segunda Diferença (Δ²p)</h3>
+                    <table class="data-table">
+                        <tr><th>Δp</th><th>Δ²p</th></tr>
+                        <tr><td>32</td><td>-</td></tr>
+                        <tr><td>16</td><td>-16</td></tr>
+                        <tr><td>0</td><td>-16</td></tr>
+                        <tr><td>-48</td><td>-48</td></tr>
+                    </table>
+                </div>
+                <div>
+                    <div class="highlight-box">
+                        <h3>Como fazer o cálculo:</h3>
+                        <p><strong>1ª Diferença:</strong></p>
+                        <p>27 - (-5) = 32</p>
+                        <p>43 - 27 = 16</p>
+                        <p>43 - 43 = 0</p>
+                        <p>-5 - 43 = -48</p>
+                        
+                        <p style="margin-top: 15px;"><strong>2ª Diferença:</strong></p>
+                        <p>16 - 32 = -16</p>
+                        <p>0 - 16 = -16</p>
+                        <p>-48 - 0 = -48</p>
+                    </div>
+                    
+                    <div class="highlight-box" style="background: linear-gradient(135deg, #c6f6d5 0%, #9ae6b4 100%);">
+                        <h3 style="color: #22543d;">Resultado do Teste</h3>
+                        <p style="color: #22543d;"><strong>✓ Função QUADRÁTICA confirmada!</strong></p>
+                        <p style="color: #22543d;">As segundas diferenças tendem a ser constantes (próximas de -16), o que é característico de funções de 2º grau.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Slide 5: Conceito da Função -->
+        <div class="slide">
+            <h1>📚 FUNÇÃO QUADRÁTICA</h1>
+            <div class="center-content">
+                <div class="highlight-box" style="max-width: 800px;">
+                    <h3>O que é uma Função Quadrática?</h3>
+                    <ul>
+                        <li>Função polinomial de segundo grau</li>
+                        <li>Forma geral: f(x) = ax² + bx + c</li>
+                        <li>Gráfico é uma parábola</li>
+                        <li>Possui um ponto de máximo ou mínimo (vértice)</li>
+                        <li>Aplicações: economia, física, engenharia</li>
+                    </ul>
+                </div>
+                <div class="formula-box">
+                    Forma Geral: f(x) = ax² + bx + c
+                </div>
+                <div style="margin-top: 30px; font-size: 1.1em; color: #4a5568;">
+                    <p><strong>No nosso caso:</strong> p = aL² + bL + c</p>
+                    <p>Onde p = preço e L = lucro</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Slide 6: Fórmula -->
+        <div class="slide">
+            <h1>🔢 CONSTRUÇÃO DA FÓRMULA</h1>
+            <div class="center-content">
+                <div class="highlight-box">
+                    <h3>Processo de Resolução</h3>
+                    <p>Usando os pontos (0, -5), (2, 27), e (4, 43):</p>
+                </div>
+                
+                <div style="margin: 20px 0; font-size: 1.2em;">
+                    <p><strong>1.</strong> Para L = 0: -5 = c → <span style="color: #e53e3e;">c = -5</span></p>
+                    <p><strong>2.</strong> Para L = 2: 27 = 4a + 2b - 5 → 4a + 2b = 32</p>
+                    <p><strong>3.</strong> Para L = 4: 43 = 16a + 4b - 5 → 16a + 4b = 48</p>
+                </div>
+                
+                <div style="margin: 20px 0; font-size: 1.2em;">
+                    <p>Resolvendo o sistema: <span style="color: #e53e3e;">a = -2</span> e <span style="color: #e53e3e;">b = 20</span></p>
+                </div>
+                
+                <div class="formula-box">
+                    p = -2L² + 20L - 5
+                </div>
+            </div>
+        </div>
+        
+        <!-- Slide 7: Gráfico Final -->
+        <div class="slide">
+            <h1>📊 FUNÇÃO COMPLETA</h1>
+            <div class="chart-container">
+                <canvas id="functionChart"></canvas>
+            </div>
+            <div class="conclusion-box">
+                <h3>Ponto Ótimo Encontrado!</h3>
+                <p>Vértice da parábola: L = 5, P = 45 reais</p>
+                <p>Este é o ponto de máximo lucro da empresa!</p>
+            </div>
+        </div>
+        
+        <!-- Slide 8: Conclusões -->
+        <div class="slide">
+            <h1>🎯 CONCLUSÕES</h1>
+            <div class="center-content">
+                <div class="highlight-box">
+                    <h3>Resultados Principais</h3>
+                    <ul>
+                        <li>Função identificada: p = -2L² + 20L - 5</li>
+                        <li>Ponto ótimo: L = 5, P = 45 reais</li>
+                        <li>Comportamento parabólico confirmado</li>
+                        <li>Modelo adequado para análise econômica</li>
+                    </ul>
+                </div>
+                
+                <div class="two-column" style="margin-top: 30px;">
+                    <div class="highlight-box" style="background: linear-gradient(135deg, #fed7d7 0%, #feb2b2 100%);">
+                        <h3 style="color: #c53030;">Limitações</h3>
+                        <ul style="color: #742a2a;">
+                            <li>Válido apenas para o intervalo estudado</li>
+                            <li>Não considera fatores externos</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="highlight-box" style="background: linear-gradient(135deg, #c6f6d5 0%, #9ae6b4 100%);">
+                        <h3 style="color: #22543d;">Aplicações</h3>
+                        <ul style="color: #22543d;">
+                            <li>Otimização de preços</li>
+                            <li>Previsão de lucros</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+     
+    <div class="navigation">
+        <button class="nav-btn" id="prevBtn" onclick="changeSlide(-1)">⬅ Anterior</button>
+        <button class="nav-btn" id="nextBtn" onclick="changeSlide(1)">Próximo ➡</button>
+    </div>
+    
+    <script>
+        let currentSlideIndex = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+        
+        document.getElementById('totalSlides').textContent = totalSlides;
+        
+        function showSlide(index) {
+            slides.forEach(slide => slide.classList.remove('active'));
+            slides[index].classList.add('active');
+            
+            document.getElementById('currentSlide').textContent = index + 1;
+            
+            // Update navigation buttons
+            document.getElementById('prevBtn').disabled = index === 0;
+            document.getElementById('nextBtn').disabled = index === totalSlides - 1;
+            
+            // Initialize charts when reaching chart slides
+            if (index === 2) {
+                setTimeout(initScatterChart, 100);
+            } else if (index === 6) {
+                setTimeout(initFunctionChart, 100);
+            }
+        }
+        
+        function changeSlide(direction) {
+            const newIndex = currentSlideIndex + direction;
+            if (newIndex >= 0 && newIndex < totalSlides) {
+                currentSlideIndex = newIndex;
+                showSlide(currentSlideIndex);
+            }
+        }
+        
+        // Keyboard navigation
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'ArrowLeft') {
+                changeSlide(-1);
+            } else if (event.key === 'ArrowRight') {
+                changeSlide(1);
+            }
+        });
+        
+        // Initialize
+        showSlide(0);
+        
+        // Chart data
+        const originalData = [
+            {x: 0, y: -5},
+            {x: 2, y: 27},
+            {x: 4, y: 43},
+            {x: 6, y: 43},
+            {x: 10, y: -5}
+        ];
+        
+        function quadraticFunction(L) {
+            return -2 * L * L + 20 * L - 5;
+        }
+        
+        const curveData = [];
+        for (let L = 0; L <= 10; L += 0.1) {
+            curveData.push({x: L, y: quadraticFunction(L)});
+        }
+        
+        function initScatterChart() {
+            const ctx = document.getElementById('scatterChart');
+            if (!ctx) return;
+            
+            new Chart(ctx.getContext('2d'), {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: 'Pontos de Dados',
+                        data: originalData,
+                        backgroundColor: '#e53e3e',
+                        borderColor: '#c53030',
+                        pointRadius: 12,
+                        pointHoverRadius: 15
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Pontos Originais: Lucro vs Preço',
+                            font: { size: 18, weight: 'bold' }
+                        },
+                        legend: {
+                            display: true,
+                            labels: { font: { size: 14 } }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Lucro Total (R$)',
+                                font: { size: 16, weight: 'bold' }
+                            },
+                            grid: { color: '#e2e8f0' }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Preço do Produto (R$)',
+                                font: { size: 16, weight: 'bold' }
+                            },
+                            grid: { color: '#e2e8f0' }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function initFunctionChart() {
+            const ctx = document.getElementById('functionChart');
+            if (!ctx) return;
+            
+            new Chart(ctx.getContext('2d'), {
+                type: 'scatter',
+                data: {
+                    datasets: [
+                        {
+                            label: 'Pontos Originais',
+                            data: originalData,
+                            backgroundColor: '#e53e3e',
+                            borderColor: '#c53030',
+                            pointRadius: 10,
+                            type: 'scatter'
+                        },
+                        {
+                            label: 'p = -2L² + 20L - 5',
+                            data: curveData,
+                            borderColor: '#3182ce',
+                            backgroundColor: 'rgba(49, 130, 206, 0.1)',
+                            pointRadius: 0,
+                            borderWidth: 4,
+                            type: 'line',
+                            tension: 0
+                        },
+                        {
+                            label: 'Ponto Ótimo (L=5, P=45)',
+                            data: [{x: 5, y: 45}],
+                            backgroundColor: '#48bb78',
+                            borderColor: '#38a169',
+                            pointRadius: 15,
+                            pointStyle: 'star',
+                            type: 'scatter'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Função Quadrática Completa',
+                            font: { size: 18, weight: 'bold' }
+                        },
+                        legend: {
+                            display: true,
+                            labels: { font: { size: 14 } }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Lucro Total (R$)',
+                                font: { size: 16, weight: 'bold' }
+                            },
+                            grid: { color: '#e2e8f0' }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Preço do Produto (R$)',
+                                font: { size: 16, weight: 'bold' }
+                            },
+                            grid: { color: '#e2e8f0' }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
